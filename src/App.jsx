@@ -4,6 +4,8 @@ import Modal from 'react-modal';
 
 Modal.setAppElement('#root');
 
+const API_URL = 'https://gestor-de-novedades-backend.onrender.com/actividades';
+
 function App() {
   const [actividades, setActividades] = useState([]);
   const [form, setForm] = useState({
@@ -24,7 +26,7 @@ function App() {
   });
 
   const cargarActividades = async () => {
-    const res = await axios.get('http://localhost:4000/actividades');
+    const res = await axios.get(API_URL);
     setActividades(res.data);
   };
 
@@ -37,41 +39,41 @@ function App() {
   const soloNumerosEspeciales = /^[0-9: -]+$/;
 
   // Agregar actividad
-const agregarActividad = async () => {
-  try {
-    if (!form.nombre.match(soloLetras)) {
-      alert('El campo "Actividad" solo acepta letras.');
-      return;
-    }
-    if (!form.lugar.match(soloLetras)) {
-      alert('El campo "Lugar" solo acepta letras.');
-      return;
-    }
-    if (!form.horario.match(soloNumerosEspeciales)) {
-      alert('El campo "Horario" solo acepta números y caracteres especiales (: -).');
-      return;
-    }
-    if (!form.fechaFin) {
-      alert('Completa la fecha de finalización.');
-      return;
-    }
-    if (!form.detalles.trim()) {
-      alert('El campo "Detalles" no puede estar vacío.');
-      return;
-    }
+  const agregarActividad = async () => {
+    try {
+      if (!form.nombre.match(soloLetras)) {
+        alert('El campo "Actividad" solo acepta letras.');
+        return;
+      }
+      if (!form.lugar.match(soloLetras)) {
+        alert('El campo "Lugar" solo acepta letras.');
+        return;
+      }
+      if (!form.horario.match(soloNumerosEspeciales)) {
+        alert('El campo "Horario" solo acepta números y caracteres especiales (: -).');
+        return;
+      }
+      if (!form.fechaFin) {
+        alert('Completa la fecha de finalización.');
+        return;
+      }
+      if (!form.detalles.trim()) {
+        alert('El campo "Detalles" no puede estar vacío.');
+        return;
+      }
 
-    await axios.post('http://localhost:4000/actividades', form);
-    setForm({ nombre: '', lugar: '', horario: '', fechaFin: '', detalles: '' });
-    cargarActividades();
-  } catch (error) {
-    alert('Error al agregar actividad');
-  }
-};
+      await axios.post(API_URL, form);
+      setForm({ nombre: '', lugar: '', horario: '', fechaFin: '', detalles: '' });
+      cargarActividades();
+    } catch (error) {
+      alert('Error al agregar actividad');
+    }
+  };
 
   // Eliminar actividad
   const eliminarActividad = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/actividades/${id}`);
+      await axios.delete(`${API_URL}/${id}`);
       cargarActividades();
     } catch (error) {
       alert('Error al eliminar actividad');
@@ -110,7 +112,7 @@ const agregarActividad = async () => {
         return;
       }
 
-      await axios.put(`http://localhost:4000/actividades/${id}`, editForm);
+      await axios.put(`${API_URL}/${id}`, editForm);
       setEditId(null);
       cargarActividades();
     } catch (error) {
@@ -125,8 +127,8 @@ const agregarActividad = async () => {
 
   // Cambios en el formulario
   const handleChange = e => {
-  setForm({ ...form, [e.target.name]: e.target.value });
-};
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleEditChange = e => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
