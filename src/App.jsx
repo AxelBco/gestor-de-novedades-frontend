@@ -42,7 +42,7 @@ function App() {
   const agregarActividad = async () => {
     try {
       if (!form.nombre.match(soloLetras)) {
-        alert('El campo "Actividad" solo acepta letras.');
+        alert('El campo "Novedad" solo acepta letras.');
         return;
       }
       if (!form.lugar.match(soloLetras)) {
@@ -66,7 +66,7 @@ function App() {
       setForm({ nombre: '', lugar: '', horario: '', fechaFin: '', detalles: '' });
       cargarActividades();
     } catch (error) {
-      alert('Error al agregar actividad');
+      alert('Error al agregar Novedad');
     }
   };
 
@@ -76,7 +76,7 @@ function App() {
       await axios.delete(`${API_URL}/${id}`);
       cargarActividades();
     } catch (error) {
-      alert('Error al eliminar actividad');
+      alert('Error al eliminar Novedad');
     }
   };
 
@@ -96,7 +96,7 @@ function App() {
   const guardarEdicion = async (id) => {
     try {
       if (!editForm.nombre.match(soloLetras)) {
-        alert('El campo "Actividad" solo acepta letras.');
+        alert('El campo "Novedad" solo acepta letras.');
         return;
       }
       if (!editForm.lugar.match(soloLetras)) {
@@ -116,7 +116,7 @@ function App() {
       setEditId(null);
       cargarActividades();
     } catch (error) {
-      alert('Error al editar actividad');
+      alert('Error al editar Novedad');
     }
   };
 
@@ -134,9 +134,15 @@ function App() {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  // Mostrar tachado si la fecha de finalización ya pasó
-  const estaFinalizada = fechaFin => {
-    return new Date(fechaFin) < new Date();
+  // Mostrar tachado si la fecha y hora de finalización ya pasaron
+  const estaFinalizada = act => {
+    if (!act.fechaFin || !act.horario) return false;
+    // Unir fecha y hora en formato ISO
+    const fecha = act.fechaFin.slice(0,10);
+    // Si horario es "16:00", unirlo a la fecha
+    const fechaHoraStr = `${fecha}T${act.horario}`;
+    const fechaHora = new Date(fechaHoraStr);
+    return new Date() > fechaHora;
   };
 
   return (
@@ -156,13 +162,13 @@ function App() {
 
       <div className="card mb-4 shadow-sm" style={{ width: '100%', fontSize: '1.3rem', maxWidth: '600px', margin: 'auto' }}>
         <div className="card-body" style={{ backgroundColor: '#000000ff' }}>
-          <h2 className="card-title mb-3" style={{ color: '#000000ff', fontSize: '2.2rem' }}>Agregar Actividad</h2>
+          <h2 className="card-title mb-3" style={{ color: '#000000ff', fontSize: '2.2rem' }}>Agregar Novedad</h2>
           <div className="row g-2" style={{ flexDirection: 'column' }}>
             <div className="col-12">
-              <input name="nombre" className="form-control form-control-lg" style={{ width: '100%' }} placeholder="Actividad" value={form.nombre} onChange={handleChange} />
+              <input name="nombre" className="form-control form-control-lg" style={{ width: '100%' }} placeholder="Novedad" value={form.nombre} onChange={handleChange} />
             </div>
             <div className="col-12">
-              <input name="lugar" className="form-control form-control-lg" style={{ width: '100%' }} placeholder="Lugar" value={form.lugar} onChange={handleChange} />
+              <input name="lugar" className="form-control form-control-lg" style={{ width: '100%' }} placeholder="Ubicacion" value={form.lugar} onChange={handleChange} />
             </div>
             <div className="col-12">
               <input name="horario" className="form-control form-control-lg" style={{ width: '100%' }} placeholder="Horario" value={form.horario} onChange={handleChange} />
@@ -194,8 +200,8 @@ function App() {
                 key={act._id}
                 className="list-group-item d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-2"
                 style={{
-                  textDecoration: estaFinalizada(act.fechaFin) ? 'line-through' : 'none',
-                  background: estaFinalizada(act.fechaFin) ? '#f8bbd0' : '#fff',
+                  textDecoration: estaFinalizada(act) ? 'line-through' : 'none',
+                  background: estaFinalizada(act) ? '#f8bbd0' : '#fff',
                   fontSize: '1.3rem',
                   padding: '22px 12px',
                 }}
@@ -232,7 +238,7 @@ function App() {
         <input name="nombre" className="form-control form-control-lg mb-3" style={{ width: '100%' }} value={editForm.nombre} onChange={handleEditChange} placeholder="Nombre" />
         <input name="lugar" className="form-control form-control-lg mb-3" style={{ width: '100%' }} value={editForm.lugar} onChange={handleEditChange} placeholder="Lugar" />
         <input name="horario" className="form-control form-control-lg mb-3" style={{ width: '100%' }} value={editForm.horario} onChange={handleEditChange} placeholder="Horario" />
-        <input name="fechaFin" type="date" className="form-control form-control-lg mb-3" style={{ width: '100%' }} value={editForm.fechaFin} onChange={handleEditChange} />
+        <input name="fechaFin" type="date" className="form-control form-control-lg mb-3" style={{ width: '100%' }} value={editForm.fechaFin} onChange={handleEditChange} placeholder="Fecha" />
         <input name="detalles" className="form-control form-control-lg mb-3" style={{ width: '100%' }} value={editForm.detalles} onChange={handleEditChange} placeholder="Detalles" />
         <div className="d-flex justify-content-end mt-3">
           <button onClick={() => guardarEdicion(editId)} className="btn btn-success btn-lg mx-2" style={{ fontSize: '1.2rem' }}>Guardar</button>
